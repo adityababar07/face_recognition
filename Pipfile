@@ -7,9 +7,11 @@ name = "pypi"
 opencv-python = "*"
 numpy = "*"
 opencv-contrib-python = "*"
+pillow = "*"
+pylint = "*"
 
 [dev-packages]
 pylint = "*"
 
 [requires]
-python_version = "3.9"
+python_version = "3.7"

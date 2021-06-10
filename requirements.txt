@@ -3,3 +3,4 @@ numpy
 opencv-contrib-python
 pillow
 pylint
+autopep8
