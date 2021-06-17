@@ -4,3 +4,5 @@ opencv-contrib-python
 pillow
 pylint
 autopep8
+cmake
+face_recognition

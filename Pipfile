@@ -9,6 +9,11 @@ numpy = "*"
 opencv-contrib-python = "*"
 pylint = "*"
 autopep8 = "*"
+<<<<<<< HEAD
+=======
+cmake = "*"
+face-recognition = "*"
+>>>>>>> a3ba67043a1d392a60de3a2af8dc2950466f3fb0
 Pillow = "*"
 
 [dev-packages]
