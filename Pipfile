@@ -7,8 +7,11 @@ name = "pypi"
 opencv-python = "*"
 numpy = "*"
 opencv-contrib-python = "*"
-pillow = "*"
 pylint = "*"
+autopep8 = "*"
+cmake = "*"
+face-recognition = "*"
+Pillow = "*"
 
 [dev-packages]
 pylint = "*"
