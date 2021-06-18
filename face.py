@@ -5,7 +5,7 @@ import os
 
 folder = "media"
 files = os.listdir(folder)
-video = cv2.VideoCapture("source.mp4")
+video = cv2.VideoCapture(0)
 
 known_face_encodings = []
 known_face_names = []
@@ -23,40 +23,40 @@ face_locations = []
 face_encoding2 = []
 
 while True:
-  print(known_face_names)
 
-  # grabbing a single frame
-  ret, frame = video.read()
-  
-  # converting the frame to small for faster encoding
-  small_frame = cv2.resize(frame, (0, 0), fx=0.5, fy=0.5)
+    # grabbing a single frame
+    ret, frame = video.read()
 
-  # converting bgr to RGB
-  rgb = small_frame[:, :, ::-1]
+    # converting the frame to small for faster encoding
+    small_frame = cv2.resize(frame, (0, 0), fx=0.5, fy=0.5)
 
-  # unknown_image = face_recognition.load_image_file(frame)
-  # unknown_image_to_draw = frame
+    # converting bgr to RGB
+    rgb = small_frame[:, :, ::-1]
 
-  face_locations = face_recognition.face_locations(rgb)
-  face_encodings2 = face_recognition.face_encodings(
-       rgb, face_locations)
+    # unknown_image = face_recognition.load_image_file(frame)
+    # unknown_image_to_draw = frame
 
-  for (top, right, bottom, left), face_encoding in zip(face_locations, face_encodings2):
-       matches = face_recognition.compare_faces(
-           known_face_encodings, face_encoding, tolerance=0.5)
-       name = "Unknown"
-       face_distances = face_recognition.face_distance(
-           known_face_encodings, face_encoding)
-       best_match_index = np.argmin(face_distances)
-       if matches[best_match_index]:
-           name = known_face_names[best_match_index]
-       cv2.rectangle(frame, (left, top),
-                     (right, bottom), (0, 255, 0), 3)
-       cv2.putText(frame, name, (left, top-20),
-                   cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2, cv2.LINE_AA)
-  # cv2.namedWindow('', cv2.WINDOW_NORMAL)
-  cv2.imshow('', frame)
-  cv2.waitKey()
+    face_locations = face_recognition.face_locations(rgb)
+    face_encodings2 = face_recognition.face_encodings(
+        rgb, face_locations)
+
+    for (top, right, bottom, left), face_encoding in zip(face_locations, face_encodings2):
+        matches = face_recognition.compare_faces(
+            known_face_encodings, face_encoding, tolerance=0.5)
+        name = "Unknown"
+        face_distances = face_recognition.face_distance(
+            known_face_encodings, face_encoding)
+        best_match_index = np.argmin(face_distances)
+        if matches[best_match_index]:
+            name = known_face_names[best_match_index]
+        cv2.rectangle(frame, (left, top), (right, bottom), (0, 255, 0), 2)
+        cv2.putText(frame, name, (left, top-20),
+                    cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2, cv2.LINE_AA)
+    # cv2.namedWindow('', cv2.WINDOW_NORMAL)
+    cv2.imshow('', frame)
+    # cv2.waitKey()
+    if cv2.waitKey(1) & 0xFF == ord('q'):
+        break
 
 video.release()
 cv2.destroyAllWindows()
