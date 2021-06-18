@@ -1,40 +1,62 @@
 import face_recognition
 import numpy as np
-import cv2
+from cv2 import cv2
+import os
 
-face_1 = face_recognition.load_image_file("/home/adityababar715/face_recognition/leyo.jpg")
-# face_1_encoding = face_recognition.face_encodings(face_1)[0]
+folder = "media"
+files = os.listdir(folder)
+video = cv2.VideoCapture("source.mp4")
 
-faces = { [-1.61746755e-01  7.80871063e-02  2.78335474e-02 -6.03227243e-02
- -9.51319188e-02  1.52076390e-02  3.93325835e-03 -9.08452719e-02
-  2.04700485e-01 -1.36008129e-01  1.10331446e-01 -4.73183766e-03
- -2.18049750e-01 -4.27012704e-02 -2.42011175e-02  2.18431592e-01
- -1.63063556e-01 -2.04504773e-01 -5.86926416e-02 -4.93013486e-02
- -4.79370449e-03  1.92595068e-02 -3.14361206e-03  1.10711560e-01
- -1.74016520e-01 -3.58642757e-01 -3.14821377e-02 -8.48829821e-02
-  2.91208923e-03 -5.62198907e-02 -3.24492753e-02  6.21438026e-02
- -2.02927694e-01 -1.05521586e-02 -4.27740626e-04  1.32051021e-01
- -5.77654652e-02 -8.99561718e-02  2.07119063e-01  2.89971624e-02
- -3.23268414e-01 -4.01736759e-02  9.23036337e-02  2.62526840e-01
-  2.52582967e-01 -5.82351349e-03 -2.50151381e-03 -7.65885636e-02
-  1.53263748e-01 -3.15982610e-01 -2.11061165e-03  1.32977128e-01
- -3.89120281e-02  4.18524519e-02  5.23466989e-02 -1.70913741e-01
-  2.80761607e-02  2.65113954e-02 -2.47737363e-01 -6.12588450e-02
- -5.87236136e-05 -4.53991517e-02 -8.96371901e-03 -1.25672547e-02
-  1.90325379e-01  1.34367213e-01 -6.28993139e-02 -1.46560758e-01
-  2.43624777e-01 -2.51151353e-01  2.19330750e-02  1.19696468e-01
- -7.92467073e-02 -2.34285012e-01 -2.76014924e-01 -3.90899926e-03
-  4.37089950e-01  2.09252372e-01 -6.72956333e-02  1.01586521e-01
- -3.35900337e-02 -4.84912843e-02  1.37126207e-01  1.28095716e-01
- -1.98744982e-03  3.84380817e-02 -7.28205591e-02  6.38519675e-02
-  2.33556598e-01  1.11800069e-02 -4.09520157e-02  1.97290108e-01
-  5.78569472e-02 -2.36564204e-02  8.03264305e-02  1.11410670e-01
- -1.20885737e-01  1.25273140e-02 -2.29566917e-01 -6.11519516e-02
-  3.77910212e-02  4.23536599e-02  5.87419942e-02  1.23773389e-01
- -1.43311024e-01  1.75651029e-01  1.70310121e-02 -5.20855598e-02
- -4.56809588e-02  1.75431557e-02 -8.75732005e-02 -3.95396277e-02
-  1.06729344e-01 -1.88870087e-01  1.54693350e-01  1.32885754e-01
- -3.93214412e-02  1.54565528e-01  8.33141357e-02  3.88734490e-02
- -8.31467006e-03 -6.90058842e-02 -1.53371811e-01 -5.82145452e-02
-  7.20473826e-02 -4.43863198e-02  1.34516984e-01  1.94312744e-02]:"leyona"}
+known_face_encodings = []
+known_face_names = []
 
+for image in files:
+
+    face = face_recognition.load_image_file(f"{folder}/{image}")
+    face_encoding = face_recognition.face_encodings(face)[0]
+
+    known_face_encodings.append(face_encoding)
+    image = image[:-4]
+    known_face_names.append(image)
+
+face_locations = []
+face_encoding2 = []
+
+while True:
+  print(known_face_names)
+
+  # grabbing a single frame
+  ret, frame = video.read()
+  
+  # converting the frame to small for faster encoding
+  small_frame = cv2.resize(frame, (0, 0), fx=0.5, fy=0.5)
+
+  # converting bgr to RGB
+  rgb = small_frame[:, :, ::-1]
+
+  # unknown_image = face_recognition.load_image_file(frame)
+  # unknown_image_to_draw = frame
+
+  face_locations = face_recognition.face_locations(rgb)
+  face_encodings2 = face_recognition.face_encodings(
+       rgb, face_locations)
+
+  for (top, right, bottom, left), face_encoding in zip(face_locations, face_encodings2):
+       matches = face_recognition.compare_faces(
+           known_face_encodings, face_encoding, tolerance=0.5)
+       name = "Unknown"
+       face_distances = face_recognition.face_distance(
+           known_face_encodings, face_encoding)
+       best_match_index = np.argmin(face_distances)
+       if matches[best_match_index]:
+           name = known_face_names[best_match_index]
+       cv2.rectangle(frame, (left, top),
+                     (right, bottom), (0, 255, 0), 3)
+       cv2.putText(frame, name, (left, top-20),
+                   cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2, cv2.LINE_AA)
+  # cv2.namedWindow('', cv2.WINDOW_NORMAL)
+  cv2.imshow('', frame)
+  cv2.waitKey()
+
+video.release()
+cv2.destroyAllWindows()
